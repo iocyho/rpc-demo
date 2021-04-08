@@ -1,13 +1,12 @@
 package cn.cyh.rpc.client.service;
 
 import cn.cyh.rpc.api.CalculatorServiceApi;
-import cn.cyh.rpc.domain.CalculatorReponse;
+import cn.cyh.rpc.domain.CalculatorResponse;
 import cn.cyh.rpc.domain.CalculatorRequest;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.sound.midi.Soundbank;
-import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class CalculatorRemoteService implements CalculatorServiceApi {
 
     @Override
     public Integer add(int num1,int num2) {
-        Socket socket =null;
+        Socket socket;
         try {
             //获取服务列表
             Map<String, List> serviceMap = getServiceMap();
@@ -48,7 +47,7 @@ public class CalculatorRemoteService implements CalculatorServiceApi {
             socket = new Socket(serviceAddress,PORT);
 
             //创建请求对象，将请求对象序列化,发送给服务端
-
+            //获取当前线程执行的方法名称
             String currentMethod = Thread.currentThread().getStackTrace()[1].getMethodName();
             System.out.println(currentMethod);
             CalculatorRequest calculatorRequest = generateRequest(currentMethod,num1, num2);
@@ -59,12 +58,12 @@ public class CalculatorRemoteService implements CalculatorServiceApi {
 
             //将服务端发来的响应结果对象反序列化
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-            Object reponse = objectInputStream.readObject();
+            Object response = objectInputStream.readObject();
 
             //将响应结果返回结果给客户端
-            if (reponse instanceof CalculatorReponse){
-                CalculatorReponse calculatorReponse = (CalculatorReponse) reponse;
-                return calculatorReponse.getResult();
+            if (response instanceof CalculatorResponse){
+                CalculatorResponse calculatorResponse = (CalculatorResponse) response;
+                return calculatorResponse.getResult();
             }
         } catch (Exception e) {
             log.error("fail", e);

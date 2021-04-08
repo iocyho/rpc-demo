@@ -1,7 +1,7 @@
 package cn.cyh.rpc.server.controller;
 
 import cn.cyh.rpc.api.CalculatorServiceApi;
-import cn.cyh.rpc.domain.CalculatorReponse;
+import cn.cyh.rpc.domain.CalculatorResponse;
 import cn.cyh.rpc.domain.CalculatorRequest;
 import cn.cyh.rpc.server.service.CalculatorServiceImpl;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class ServerController {
 
 
                 //将计算结果封装到Response对象,Response对象序列化，向客户端发送
-                CalculatorReponse calculatorReponse = new CalculatorReponse();
+                CalculatorResponse calculatorReponse = new CalculatorResponse();
                 calculatorReponse.setResult(result);
                 ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                 outputStream.writeObject(calculatorReponse);
