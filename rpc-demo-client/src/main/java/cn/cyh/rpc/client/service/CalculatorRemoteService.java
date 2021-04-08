@@ -21,8 +21,13 @@ import java.util.Map;
  * @Version V1.0
  **/
 public class CalculatorRemoteService implements CalculatorServiceApi {
-    private static Logger log = LoggerFactory.getLogger(CalculatorRemoteService.class);
-    public static final int PORT = 10086;
+    private static final Logger log = LoggerFactory.getLogger(CalculatorRemoteService.class);
+
+    public final int port;
+
+    public CalculatorRemoteService(int port) {
+        this.port = port;
+    }
 
     /**
      * @Description 这个地址模拟的是远程服务的地址，理论上还要进行一次客户端的负载均衡，从多个服务实例中找一个的去调用
@@ -37,23 +42,22 @@ public class CalculatorRemoteService implements CalculatorServiceApi {
         Socket socket;
         try {
             //获取服务列表
-            Map<String, List> serviceMap = getServiceMap();
+            Map<String, List<String>> serviceMap = getServiceMap();
             //获取服务实例列表,其实是应该根据接口获取接口名称，再根据接口名称查询服务
             List<String> calculatorServiceList = serviceMap.get("calculator");
             //选择一个服务实例,得到实例地址
             String serviceAddress = chooseTarget(calculatorServiceList);
 
             //创建Socket,与服务实例通信
-            socket = new Socket(serviceAddress,PORT);
+            socket = new Socket(serviceAddress, port);
 
             //创建请求对象，将请求对象序列化,发送给服务端
             //获取当前线程执行的方法名称
             String currentMethod = Thread.currentThread().getStackTrace()[1].getMethodName();
-            System.out.println(currentMethod);
-            CalculatorRequest calculatorRequest = generateRequest(currentMethod,num1, num2);
+            log.info("executing method: {}", currentMethod);
+            CalculatorRequest calculatorRequest = generateRequest(currentMethod, num1, num2);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             objectOutputStream.writeObject(calculatorRequest);
-
             log.info("request is {}",calculatorRequest);
 
             //将服务端发来的响应结果对象反序列化
@@ -95,12 +99,12 @@ public class CalculatorRemoteService implements CalculatorServiceApi {
      * @Param []
      * @return java.util.Map<java.lang.String,java.util.List>
      **/
-    public static Map<String,List> getServiceMap(){
+    public static Map<String,List<String>> getServiceMap(){
         //创建服务列表
-        HashMap<String, List> serviceMap = new HashMap<>(10);
+        HashMap<String, List<String>> serviceMap = new HashMap<>(10);
 
         //创建一个calculatorService服务
-        ArrayList<String> calculatorService = new ArrayList<>();
+        List<String> calculatorService = new ArrayList<>();
         calculatorService.add("127.0.0.1");
 
         //将服务注册到服务列表中

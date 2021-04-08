@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @Program simple-rpc
- * @Description TODO
+ * @Description RPC客户端
  * @Author cyh
  * @Date 2019/3/15 22:57
  * @Version V1.0
@@ -22,8 +22,8 @@ public class ClientController {
 
 
     private void run() {
-        //创建代理对象，调用远程服务
-        CalculatorServiceApi calculatorRemoteService = new CalculatorRemoteService();
+        // 创建代理对象，调用远程服务
+        CalculatorServiceApi calculatorRemoteService = new CalculatorRemoteService(10086);
         Integer result = calculatorRemoteService.add(4, 6);
         log.info("result is {}",result);
     }
